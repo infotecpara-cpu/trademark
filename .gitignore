@@ -3,5 +3,3 @@
 /*.tgz
 /*.zip
 /locales/*.mo
-/vendor
-/themes/*/*.css
