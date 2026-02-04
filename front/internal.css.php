@@ -1,15 +1,17 @@
 <?php
 
+use GlpiPlugin\Trademark\Config as TrademarkConfig;
+use GlpiPlugin\Trademark\Toolbox as TrademarkToolbox;
+
 $_GET["donotcheckversion"]   = true;
 $dont_check_maintenance_mode = true;
 
 include('../../../inc/includes.php');
 
-// Redirect if is a not cached URL
+// Redirecionamento para controle de cache
 if (!isset($_GET['_'])) {
-   $timestamp = PluginTrademarkToolbox::getTimestamp();
+   $timestamp = TrademarkToolbox::getTimestamp();
 
-   // Disable cache and redirect to cached URL
    header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
    header("Cache-Control: post-check=0, pre-check=0", false);
    header("Pragma: no-cache");
@@ -26,33 +28,41 @@ if (!isset($_GET['_'])) {
 $name = 'internal';
 $css = "";
 
-$picture = PluginTrademarkConfig::getConfig("{$name}_picture", '');
+// Busca configurações via Namespace
+$picture = TrademarkConfig::getConfig("{$name}_picture", '');
+$width   = TrademarkConfig::getConfig("{$name}_picture_width", '100px');
+$height  = TrademarkConfig::getConfig("{$name}_picture_height", '55px');
+
 if ($picture) {
-   $css .= ".page .glpi-logo {";
-   $css .= " width: " . PluginTrademarkConfig::getConfig("{$name}_picture_width", '100px') . " !important;";
-   $css .= " height: " . PluginTrademarkConfig::getConfig("{$name}_picture_height", '55px') . " !important;";
-   $css .= " background-size: contain !important;";
-   $css .= " background-repeat: no-repeat !important;";
-   $css .= " background-position: center !important;";
-   $css .= " background-image: url(\"" . PluginTrademarkToolbox::getPictureUrl($picture) . "\") !important;";
-   $css .= "}";
+   $url = TrademarkToolbox::getPictureUrl($picture);
+
+   /* Seletores atualizados para o layout Tabler do GLPI 11 */
+   $css .= "
+   .navbar-brand-autodark,
+   .glpi-logo {
+      background-image: url('$url') !important;
+      background-size: contain !important;
+      background-repeat: no-repeat !important;
+      background-position: center !important;
+      width: $width !important;
+      height: $height !important;
+      display: inline-block;
+   }
+   /* Oculta o SVG original do GLPI 11 que fica dentro da div */
+   .navbar-brand-autodark svg,
+   .glpi-logo svg {
+      display: none !important;
+   }
+   ";
 }
 
-$css_type = PluginTrademarkConfig::getConfig("{$name}_css_type", 'scss');
-$css_custom = PluginTrademarkConfig::getConfig("{$name}_css_custom", '');
-
+$css_type   = TrademarkConfig::getConfig("{$name}_css_type", 'css');
+$css_custom = TrademarkConfig::getConfig("{$name}_css_custom", '');
 $css_custom = html_entity_decode($css_custom);
 
-if ($css_type === 'scss' && $css_custom && PluginTrademarkScss::hasScssSuport()) {
-   try {
-      $variables = [];
-      $variables['trademark_timestamp'] = PluginTrademarkToolbox::getTimestamp();
-
-      $css .= PluginTrademarkScss::compileScss($css_custom, $variables);
-   } catch (\Throwable $th) {
-      \Glpi\Application\ErrorHandler::getInstance()->handleException($th);
-   }
-} else if ($css_type === 'css') {
+// Nota: Removido suporte a SCSS para simplificar,
+// a menos que você tenha a biblioteca instalada no seu src/
+if ($css_custom) {
    $css .= $css_custom;
 }
 
@@ -60,7 +70,6 @@ header('Content-Type: text/css');
 
 $is_cacheable = !isset($_GET['debug']) && !isset($_GET['nocache']);
 if ($is_cacheable) {
-   // Makes CSS cacheable by browsers and proxies
    $max_age = WEEK_TIMESTAMP;
    header_remove('Pragma');
    header('Cache-Control: public');
