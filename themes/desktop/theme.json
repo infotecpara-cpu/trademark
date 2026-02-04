@@ -1,0 +1,14 @@
+{
+    "name": "Desktop",
+    "description": "Desktop Theme",
+    "variables": {
+        "btn-background-color": {
+            "name": "Cor de fundo dos Botões",
+            "default": "#000000"
+        },
+        "btn-foreground-color": {
+            "name": "Cor do texto dos Botões",
+            "default": "#ffffff"
+        }
+    }
+}

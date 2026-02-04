@@ -1,0 +1,14 @@
+{
+    "name": "Prompt Developer",
+    "description": "Prompt Developer Theme",
+    "variables": {
+        "btn-background-color": {
+            "name": "Cor de fundo dos Botões",
+            "default": "#0000003b"
+        },
+        "btn-foreground-color": {
+            "name": "Cor do texto dos Botões",
+            "default": "#ffffff"
+        }
+    }
+}

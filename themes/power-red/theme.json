@@ -1,0 +1,14 @@
+{
+    "name": "Power Red",
+    "description": "Power Red Theme",
+    "variables": {
+        "btn-background-color": {
+            "name": "Cor de fundo dos Botões",
+            "default": "#013453"
+        },
+        "btn-foreground-color": {
+            "name": "Cor do texto dos Botões",
+            "default": "#ffffff"
+        }
+    }
+}

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+    <name>Trademark for GLPI</name>
+    <key>trademark</key>
+    <state>stable</state>
+    <logo>https://raw.githubusercontent.com/edgardmessias/glpi-trademark/main/plugin.png</logo>
+    <description>
+        <short>
+            <en><![CDATA[Trademark for GLPI]]></en>
+        </short>
+        <long>
+            <en><![CDATA[
+               # Trademark for GLPI >= 10.0
+
+               ![Lint](https://github.com/edgardmessias/glpi-trademark/workflows/Lint/badge.svg)
+               [![CodeFactor](https://www.codefactor.io/repository/github/edgardmessias/glpi-trademark/badge)](https://www.codefactor.io/repository/github/edgardmessias/glpi-trademark)
+               [![Total Downloads](https://img.shields.io/github/downloads/edgardmessias/glpi-trademark/total.svg)](https://github.com/edgardmessias/glpi-trademark/releases)
+               [![Current Release](https://img.shields.io/github/release/edgardmessias/glpi-trademark.svg)](https://github.com/edgardmessias/glpi-trademark/releases/latest)
+
+               Allow customization of logos, background and custom CSSs
+
+               # Installation
+                * Download the plugin: [trademark.zip](https://github.com/edgardmessias/glpi-trademark/releases/latest/download/trademark.zip) or [trademark.tgz](https://github.com/edgardmessias/glpi-trademark/releases/latest/download/trademark.tgz)
+                * Uncompress the archive to the `<GLPI_ROOT>/plugins/trademark` directory
+                * Navigate to the Configuration > Plugins page,
+                * Install and activate the plugin.
+
+               # Partnership
+
+               [Nextflow](https://nextflow.com.br)
+               ]]></en>
+        </long>
+    </description>
+    <homepage>https://github.com/edgardmessias/glpi-trademark</homepage>
+    <download>https://github.com/edgardmessias/glpi-trademark/releases</download>
+    <issues>https://github.com/edgardmessias/glpi-trademark/issues</issues>
+    <readme>https://github.com/edgardmessias/glpi-trademark/wiki</readme>
+    <authors>
+        <author>Edgard Lorraine Messias</author>
+        <author>Nextflow</author>
+    </authors>
+    <versions>
+        <version>
+            <num>2.0.2</num>
+            <compatibility>~10.0.0</compatibility>
+            <download_url>https://github.com/edgardmessias/glpi-trademark/releases/download/v2.0.2/trademark.zip</download_url>
+        </version>
+        <version>
+            <num>1.2.4</num>
+            <compatibility>~9.3</compatibility>
+            <download_url>https://github.com/edgardmessias/glpi-trademark/releases/download/v1.2.4/trademark.zip</download_url>
+        </version>
+    </versions>
+    <langs>
+        <lang>en_GB</lang>
+        <lang>pt_BR</lang>
+    </langs>
+    <license><![CDATA[MIT]]></license>
+    <tags>
+        <en>
+            <tag>Customization</tag>
+            <tag>CSS</tag>
+            <tag>SCSS</tag>
+        </en>
+    </tags>
+    <screenshots>
+      <screenshot>https://raw.githubusercontent.com/edgardmessias/glpi-trademark/main/themes/aurora-boreal/login.preview.jpg</screenshot>
+      <screenshot>https://raw.githubusercontent.com/edgardmessias/glpi-trademark/main/themes/baloons/login.preview.jpg</screenshot>
+      <screenshot>https://raw.githubusercontent.com/edgardmessias/glpi-trademark/main/themes/cloud/login.preview.jpg</screenshot>
+      <screenshot>https://raw.githubusercontent.com/edgardmessias/glpi-trademark/main/themes/desktop/login.preview.jpg</screenshot>
+      <screenshot>https://raw.githubusercontent.com/edgardmessias/glpi-trademark/main/themes/light/login.preview.jpg</screenshot>
+      <screenshot>https://raw.githubusercontent.com/edgardmessias/glpi-trademark/main/themes/neon/login.preview.jpg</screenshot>
+      <screenshot>https://raw.githubusercontent.com/edgardmessias/glpi-trademark/main/themes/night/login.preview.jpg</screenshot>
+      <screenshot>https://raw.githubusercontent.com/edgardmessias/glpi-trademark/main/themes/original/login.preview.jpg</screenshot>
+      <screenshot>https://raw.githubusercontent.com/edgardmessias/glpi-trademark/main/themes/power-red/login.preview.jpg</screenshot>
+      <screenshot>https://raw.githubusercontent.com/edgardmessias/glpi-trademark/main/themes/prompt-developer/login.preview.jpg</screenshot>
+   </screenshots>
+</root>

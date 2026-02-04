@@ -1,0 +1,18 @@
+{
+    "name": "Ballons",
+    "description": "Ballons Theme",
+    "variables": {
+        "btn-background-color1": {
+            "name": "Cor de fundo 1 dos Botões",
+            "default": "#593a90"
+        },
+        "btn-background-color2": {
+            "name": "Cor de fundo 2 dos Botões",
+            "default": "#7551b5"
+        },
+        "btn-foreground-color": {
+            "name": "Cor do texto dos Botões",
+            "default": "#ffffff"
+        }
+    }
+}

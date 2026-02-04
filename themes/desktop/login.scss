@@ -1,0 +1,147 @@
+/*Tema 1 - Desktop*/
+
+$btn-background-color: #000000 !default;
+$btn-foreground-color: #ffffff !default;
+
+body .card {
+   border: 0;
+   background: transparent;
+}
+
+.col-md-5 {
+   margin: 0 !important;
+   width: 100%;
+}
+
+h2.card-header.text-center.mb-4,
+div.card-header:has(.mx-auto) {
+   display: none;
+}
+
+span.glpi-logo.mb-4 {
+   margin: 0 !important;
+}
+
+.btn-primary,
+.btn-outline-primary,
+.btn-ghost-primary {
+   --tblr-btn-color: #71090e;
+   --tblr-btn-color-interactive: #8d0a10;
+   --tblr-btn-color-text: #1e293b;
+}
+
+.mb-3,
+.mb-4 {
+   position: relative;
+}
+
+.mb-3:after {
+   font-family: "Font Awesome 5 Free";
+   font-weight: 900;
+   content: "\f007";
+   position: absolute;
+   right: 20px;
+   color: #6a696982;
+   top: 12px;
+}
+
+.mb-4:before {
+   font-family: "Font Awesome 5 Free";
+   font-weight: 900;
+   content: "\f023";
+   position: absolute;
+   right: 20px;
+   color: #6a696982;
+   top: 12px;
+}
+
+.col-md-5 {
+   margin: 0 !important;
+   width: 100%;
+   max-width: 289px;
+}
+
+label.form-label {
+   color: #a6abb1;
+}
+
+.card-body {
+   padding: 0px !important;
+   margin: auto;
+}
+
+.flex-fill.d-flex.flex-column.justify-content-center.py-4.mt-4 {
+   width: 50%;
+   background: #ffffffc9;
+   border-radius: 30px;
+   margin: 0;
+   outline-offset: 0;
+   box-shadow: 0px 6px 13px 1px #00000047;
+   left: 0;
+   height: 100% !important;
+   top: -32px;
+   border-radius: 0;
+   position: absolute;
+   padding-top: 130px !important;
+   padding-bottom: 110px !important;
+}
+
+button.btn.btn-primary.w-100 {
+   color: $btn-foreground-color;
+   padding: 11px;
+   border-radius: 30px;
+   border: 1px solid #fff;
+   background: $btn-background-color;
+}
+
+a {
+   color: #000000 !important;
+   text-decoration: underline;
+}
+
+body .form-control {
+   display: block;
+   width: 100%;
+   min-width: 250px;
+   padding: 0.7375rem 0.75rem;
+   font-size: 0.875rem;
+   font-weight: 400;
+   line-height: 1.4285714286;
+   color: inherit;
+   background-color: #fdfdfd;
+   background-clip: padding-box;
+   border: 0;
+   appearance: none;
+   border-radius: 34px;
+   transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+   background: #fff;
+   border-radius: 0;
+   border-bottom: 1px solid;
+}
+
+label.form-label {
+   display: none;
+   color: #fff;
+}
+span.form-label-description {
+   margin-top: 10px;
+   margin-bottom: 10px;
+   text-align: left;
+   width: 100%;
+   display: block;
+}
+.card-body {
+   margin: 0 auto;
+   width: 350px;
+   max-width: 100%;
+}
+.col-auto.offset-md-1.p-2.text-center {
+   display: none;
+}
+.form-control:focus {
+   color: inherit;
+   background-color: #fdfdfd;
+   border-color: #013453;
+   outline: 0;
+   box-shadow: 0 0 0 0.25rem #5e5e5e3b;
+}
