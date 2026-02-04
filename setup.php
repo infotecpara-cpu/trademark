@@ -26,10 +26,7 @@ function plugin_init_trademark() {
 
       /* ---------- Registro de Classes ---------- */
       // No GLPI 11, o 'addtabon' deve referenciar a classe onde a aba aparecerá
-      Plugin::registerClass(
-         Config::class,
-         ['addtabon' => ['Config']]
-      );
+      Plugin::registerClass(\GlpiPlugin\Trademark\Config::class, ['addtabon' => ['Config']]);
 
       /* ---------- Hooks de Interface ---------- */
       $PLUGIN_HOOKS['config_page']['trademark'] = 'front/config.form.php';
