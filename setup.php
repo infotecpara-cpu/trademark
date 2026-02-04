@@ -2,71 +2,59 @@
 
 use GlpiPlugin\Trademark\Config;
 
-define('PLUGIN_TRADEMARK_VERSION', '2.0.2-glpi11');
-
-// Minimal GLPI version, inclusive
+// Versão atualizada para refletir a compatibilidade
+define('PLUGIN_TRADEMARK_VERSION', '2.0.3-glpi11');
 define("PLUGIN_TRADEMARK_MIN_GLPI_VERSION", "11.0.0");
-
-// Maximum GLPI version, exclusive
 define("PLUGIN_TRADEMARK_MAX_GLPI_VERSION", "11.99.99");
 
-$folder = basename(dirname(__FILE__));
-
-if ($folder !== "trademark") {
-   $msg = sprintf(
-      "Please, rename the plugin folder \"%s\" to \"trademark\"",
-      $folder
-   );
-   \Session::addMessageAfterRedirect($msg, true, ERROR);
-}
-
-// Init the hooks of the plugins
+/**
+ * Init plugin
+ */
 function plugin_init_trademark() {
-   global $PLUGIN_HOOKS, $CFG_GLPI;
+   global $PLUGIN_HOOKS;
 
    $PLUGIN_HOOKS['csrf_compliant']['trademark'] = true;
 
-   $PLUGIN_HOOKS['config_page']['trademark']
-      = '../../front/config.form.php?itemtype=Config&glpi_tab=Config$1';
+   // No GLPI 11, o autoload deve ser carregado o quanto antes
+   $autoload = __DIR__ . '/vendor/autoload.php';
+   if (file_exists($autoload)) {
+      require_once $autoload;
+   }
 
-   $plugin = new Plugin();
+   // Verifica se está instalado e ativo para registrar os hooks
+   if (Plugin::isPluginActive('trademark')) {
 
-   if ($plugin->isInstalled('trademark') && $plugin->isActivated('trademark')) {
-
-      $autoload = __DIR__ . '/vendor/autoload.php';
-      if (file_exists($autoload)) {
-         require_once $autoload;
-      }
-
-      // Registro correto para GLPI 11 (namespace)
+      /* ---------- Registro de Classes ---------- */
+      // No GLPI 11, o 'addtabon' deve referenciar a classe onde a aba aparecerá
       Plugin::registerClass(
-         \GlpiPlugin\Trademark\Config::class,
+         Config::class,
          ['addtabon' => ['Config']]
       );
 
-      $PLUGIN_HOOKS['display_login']['trademark']
-         = "plugin_trademark_display_login";
+      /* ---------- Hooks de Interface ---------- */
+      $PLUGIN_HOOKS['config_page']['trademark'] = 'front/config.form.php';
 
-      $PLUGIN_HOOKS["add_css"]['trademark']
-         = new PluginTrademarkFileVersion('front/internal.css.php');
+      // Hook para exibição na tela de login
+      $PLUGIN_HOOKS['display_login']['trademark'] = 'plugin_trademark_display_login';
 
-      $PLUGIN_HOOKS["add_javascript"]['trademark']
-         = new PluginTrademarkFileVersion('front/internal.js.php');
-
-      $CFG_GLPI['javascript']['config']['config'][] = 'codemirror';
-      $CFG_GLPI['javascript']['config']['config'][] = 'tinymce';
+      /* ---------- Ativos (CSS e JS) ---------- */
+      // Nota: No GLPI 11, prefira arquivos estáticos (.css/.js) em vez de .php se possível
+      $PLUGIN_HOOKS['add_css']['trademark'][] = 'front/internal.css.php';
+      $PLUGIN_HOOKS['add_javascript']['trademark'][] = 'front/internal.js.php';
    }
 }
 
-// Plugin version
+/**
+ * Version info
+ */
 function plugin_version_trademark() {
    return [
-      'name'        => __('Trademark', 'trademark'),
-      'version'     => PLUGIN_TRADEMARK_VERSION,
-      'author'      => 'Nextflow / Edgard',
-      'homepage'    => 'https://nextflow.com.br/plugin-glpi/trademark',
-      'license'     => 'GPL v2+',
-      'requirements' => [
+      'name'           => __('Trademark', 'trademark'),
+      'version'        => PLUGIN_TRADEMARK_VERSION,
+      'author'         => 'Nextflow / Edgard',
+      'homepage'       => 'https://nextflow.com.br/plugin-glpi/trademark',
+      'license'        => 'GPL v2+',
+      'requirements'   => [
          'glpi' => [
             'min' => PLUGIN_TRADEMARK_MIN_GLPI_VERSION,
             'max' => PLUGIN_TRADEMARK_MAX_GLPI_VERSION
@@ -75,10 +63,12 @@ function plugin_version_trademark() {
    ];
 }
 
-// Check prerequisites
+/**
+ * Prerequisites check
+ */
 function plugin_trademark_check_prerequisites() {
-   if (version_compare(GLPI_VERSION, PLUGIN_TRADEMARK_MIN_GLPI_VERSION, 'lt')) {
-      echo "This plugin requires GLPI >= " . PLUGIN_TRADEMARK_MIN_GLPI_VERSION;
+   if (version_compare(GLPI_VERSION, PLUGIN_TRADEMARK_MIN_GLPI_VERSION, '<')) {
+      echo "Este plugin requer o GLPI >= " . PLUGIN_TRADEMARK_MIN_GLPI_VERSION;
       return false;
    }
    return true;

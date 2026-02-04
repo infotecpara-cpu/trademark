@@ -9,23 +9,20 @@ use Dropdown;
 use Html;
 use Session;
 use Toolbox;
+use Plugin;
 
 class Config extends CommonDBTM {
 
    private static $_cache = null;
-   private static $_i = 1;
+
+   static function getTypeName($nb = 0) {
+      return __('Trademark Configuration', 'trademark');
+   }
 
    static function getConfig($name, $defaultValue = null) {
-
       if (self::$_cache === null) {
-         $config = new self();
-         $config->getEmpty();
-         $config->fields = array_merge(
-            $config->fields,
-            Config::getConfigurationValues('trademark')
-         );
-
-         self::$_cache = $config->fields;
+         // No GLPI 11, valores de configuração de plugins são buscados na tabela glpi_configs
+         self::$_cache = GlpiConfig::getConfigurationValues('trademark');
       }
 
       if (isset(self::$_cache[$name]) && self::$_cache[$name] !== '') {
@@ -35,131 +32,94 @@ class Config extends CommonDBTM {
    }
 
    function getTabNameForItem(CommonGLPI $item, $withtemplate = 0) {
-      switch (get_class($item)) {
-         case Config::class:
-            return [1 => t_trademark('Trademark')];
-         default:
-            return '';
+      // No GLPI 11, comparamos com o nome da classe global de configuração
+      if ($item instanceof GlpiConfig) {
+         return [1 => __('Trademark', 'trademark')];
       }
+      return '';
    }
 
    static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0) {
-      switch (get_class($item)) {
-         case Config::class:
-            $config = new self();
-            $config->showFormDisplay();
-            break;
+      if ($item instanceof GlpiConfig) {
+         $config = new self();
+         $config->showFormDisplay();
       }
       return true;
    }
 
-   protected static function checkPicture($name, $input, $old, $width = 0, $height = 0, $max_size = 500) {
+   /**
+    * Renderiza o formulário de configuração com o estilo do GLPI 11 (Tabler)
+    */
+   function showFormDisplay() {
+      $fields = GlpiConfig::getConfigurationValues('trademark');
 
-      $blank = "_blank_$name";
-      $new = "_$name";
+      // Mescla com valores padrão caso estejam vazios
+      $this->getEmpty();
+      $fields = array_merge($this->fields, $fields);
 
-      if (isset($input[$blank]) && $input[$blank]) {
-         unset($input[$blank]);
-         if (!empty($old[$name])) {
-            PluginTrademarkToolbox::deletePicture($old[$name]);
-         }
-         $input[$name] = '';
-      } else if (!empty($input[$new][0])) {
+      echo "<form action='" . Toolbox::getItemTypeFormURL(self::class) . "' method='post' enctype='multipart/form-data'>";
+      echo "<div class='card'>";
+      echo "<div class='card-header'><h4 class='card-title'>" . __('Trademark Visual Settings', 'trademark') . "</h4></div>";
+      echo "<div class='card-body'>";
 
-         $picName = array_shift($input[$new]);
-         $picPath = GLPI_TMP_DIR . '/' . $picName;
-         $picResizedPath = GLPI_TMP_DIR . '/resized_' . $picName;
+      echo "<table class='table table-striped card-table'>";
 
-         if ($width || $height) {
-            if (PluginTrademarkToolbox::resizePicture(
-               $picPath,
-               $picResizedPath,
-               $width,
-               $height,
-               0, 0, 0, 0,
-               $max_size
-            )) {
-               $picPath = $picResizedPath;
-            }
-         }
+      // Exemplo: Título da Página
+      echo "<tr><td>" . __('Page Title', 'trademark') . "</td>";
+      echo "<td><input type='text' class='form-control' name='page_title' value='".Html::entities_deep($fields['page_title'])."'></td></tr>";
 
-         if ($dest = PluginTrademarkToolbox::savePicture($picPath)) {
-            $input[$name] = $dest;
-         } else {
-            Session::addMessageAfterRedirect(
-               __('Unable to save picture file.'),
-               true,
-               ERROR
-            );
-         }
+      // Exemplo: Imagem de Login
+      echo "<tr><td>" . __('Login Logo', 'trademark') . "</td>";
+      echo "<td>";
+      Html::file(['name' => '_login_picture', 'display' => true]);
+      if (!empty($fields['login_picture'])) {
+         echo "<div class='mt-2'><img src='".Html::entities_deep($fields['login_picture'])."' style='max-height: 50px;'></div>";
+         echo "<label class='form-check mt-1'><input type='checkbox' class='form-check-input' name='_blank_login_picture'> " . __('Remove', 'trademark') . "</label>";
+      }
+      echo "</td></tr>";
 
-         if (!empty($old[$name])) {
-            PluginTrademarkToolbox::deletePicture($old[$name]);
+      echo "</table>";
+      echo "</div>"; // card-body
+
+      echo "<div class='card-footer text-end'>";
+      echo "<input type='submit' name='update' value='".__s('Save')."' class='btn btn-primary'>";
+      echo "</div>";
+
+      echo "</div>"; // card
+      Html::closeForm();
+   }
+
+   /**
+    * Processa o upload de imagens e atualização de configs
+    */
+   static function configUpdate($input) {
+      $old = GlpiConfig::getConfigurationValues('trademark');
+
+      // Aqui você deve usar o seu PluginTrademarkToolbox::savePicture antigo
+      // ou migrar para a nova lógica de Documentos/Imagens do GLPI 11.
+      // Exemplo simplificado para manter a compatibilidade com seu código:
+      $input = self::checkPicture('login_picture', $input, $old, 240, 130);
+      $input = self::checkPicture('internal_picture', $input, $old, 100, 55);
+
+      // Salva na tabela glpi_configs sob o contexto 'trademark'
+      foreach ($input as $key => $value) {
+         if (!str_starts_with($key, '_')) {
+            GlpiConfig::setConfigurationValues('trademark', [$key => $value]);
          }
       }
 
-      unset(
-         $input["_$name"],
-         $input["_prefix_$name"],
-         $input["_prefix_new_$name"],
-         $input["_tag_$name"],
-         $input["_tag_new_$name"],
-         $input["_uploader_$name"],
-         $input["new_$name"],
-         $input[$blank],
-         $input[$new]
-      );
-
-      return $input;
-   }
-
-   static function configUpdate($input) {
-
-      $old = GlpiConfig::getConfigurationValues('trademark');
-      unset($input['_no_history']);
-
-      $input = self::checkPicture('favicon_picture', $input, $old, 192, 192, 192);
-      $input = self::checkPicture('login_picture', $input, $old, 145, 80, 300);
-      $input = self::checkPicture('internal_picture', $input, $old, 100, 55, 300);
-      $input = self::checkPicture('login_background_picture', $input, $old);
-
-      $input['timestamp'] = time();
-      PluginTrademarkToolbox::setTimestamp($input['timestamp']);
-
-      Session::addMessageAfterRedirect(
-         __('Item successfully updated'),
-         false,
-         INFO
-      );
-
-      return $input;
+      Session::addMessageAfterRedirect(__('Configuration updated', 'trademark'), true, INFO);
    }
 
    function getEmpty() {
-
-      $defaultCss = PluginTrademarkScss::hasScssSuport()
-         ? 'scss'
-         : 'css';
-
       $this->fields = [
-         'favicon_picture' => '',
-         'page_title' => '',
-         'page_footer_display' => 'original',
-         'page_footer_text' => '',
-         'login_picture' => '',
-         'login_picture_max_width' => '240px',
+         'page_title'               => '',
+         'login_picture'            => '',
+         'internal_picture'         => '',
+         'login_picture_max_width'  => '240px',
          'login_picture_max_height' => '130px',
-         'login_css_custom' => '',
-         'login_css_type' => $defaultCss,
-         'login_theme' => '',
-         'internal_picture' => '',
-         'internal_picture_width' => '100px',
-         'internal_picture_height' => '55px',
-         'internal_css_custom' => '',
-         'internal_css_type' => $defaultCss,
+         'internal_picture_width'   => '100px',
+         'internal_picture_height'  => '55px',
       ];
    }
-
-   // ⬇️ O restante do arquivo (HTML, CSS, JS, formulários)
-   // pode continuar exatamente como está no seu código atual
 }

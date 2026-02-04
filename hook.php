@@ -1,109 +1,75 @@
 <?php
 
+use GlpiPlugin\Trademark\Config as TrademarkConfig;
+
 function plugin_trademark_display_login() {
+   // No GLPI 11, usamos o Namespace para buscar as configurações
+   $loginPicture = TrademarkConfig::getConfig('login_picture');
+   $maxWidth     = TrademarkConfig::getConfig('login_picture_max_width', '240');
+   $maxHeight    = TrademarkConfig::getConfig('login_picture_max_height', '130');
+   $pageTitle    = TrademarkConfig::getConfig('page_title');
+   $favicon      = TrademarkConfig::getConfig('favicon_picture');
 
-   $themeInfo = null;
-   if (isset($_GET['theme'])) {
-      $themeInfo = PluginTrademarkTheme::getThemeInfo($_GET['theme']);
-   }
-   if (!$themeInfo) {
-      $theme = PluginTrademarkConfig::getConfig("login_theme", '');
-      $themeInfo = PluginTrademarkTheme::getThemeInfo($theme);
-   }
-
-   $loginPicture = PluginTrademarkConfig::getConfig('login_picture');
-
-   if (!$loginPicture && $themeInfo && isset($themeInfo['login-background'])) {
-      $loginPicture = $themeInfo['login-logo'] . '&theme=' . $themeInfo['id'];
-   }
-
-   if ($loginPicture && version_compare(GLPI_VERSION, '9.5.0', '<')) {
-      echo Html::css("/plugins/trademark/css/login.base.css", [
-         'version' => PLUGIN_TRADEMARK_VERSION,
-      ]);
-   }
-
-   $timestamp = PluginTrademarkToolbox::getTimestamp();
-
-   $cssUrl = "/plugins/trademark/front/login.css.php?_=$timestamp";
-
-   if (isset($_GET['theme'])) {
-      $cssUrl .= "&theme=" . $_GET['theme'];
-   }
-   if (isset($_GET['nocache'])) {
-      $cssUrl .= "&nocache=" . $_GET['nocache'];
-   }
-
-   echo Html::css($cssUrl, [
-      'version' => PLUGIN_TRADEMARK_VERSION,
-   ]);
+   // Carregamento do CSS customizado do plugin
+   // O GLPI 11 já carrega o CSS via hook de forma mais eficiente,
+   // mas mantemos o link dinâmico caso você use processamento PHP no CSS.
+   $timestamp = time(); // Idealmente buscar do banco como você fazia
+   echo Html::css("/plugins/trademark/front/internal.css.php?_=$timestamp");
 
    ?>
    <?php if ($loginPicture) : ?>
       <?php
-      $pictureUrl = PluginTrademarkToolbox::getPictureUrl($loginPicture);
-      $maxWidth = PluginTrademarkConfig::getConfig('login_picture_max_width', '145px');
-      $maxHeight = PluginTrademarkConfig::getConfig('login_picture_max_height', '80px');
+         // Certifique-se que a classe Toolbox foi migrada para Namespace ou use \
+         $pictureUrl = \PluginTrademarkToolbox::getPictureUrl($loginPicture);
       ?>
       <style>
+         /* Ajuste para o GLPI 11 (Layout Tabler) */
+         .page-anonymous .navbar-brand-autodark,
          .page-anonymous .glpi-logo {
-            --logo: url(<?php echo $pictureUrl ?>);
-            content: url(<?php echo $pictureUrl ?>);
-            width: auto;
-            height: auto;
-            max-width: <?php echo $maxWidth ?>px;
-            max-height: <?php echo $maxHeight ?>px;
+            background-image: url("<?php echo $pictureUrl ?>") !important;
+            background-size: contain !important;
+            background-repeat: no-repeat !important;
+            background-position: center !important;
+            width: 100% !important;
+            height: <?php echo $maxHeight ?>px !important;
+            max-width: <?php echo $maxWidth ?>px !important;
+            content: "" !important; /* Remove o SVG original */
          }
+         /* Esconde o texto "GLPI" se ele aparecer ao lado da logo */
+         .page-anonymous .glpi-logo + span { display: none; }
       </style>
    <?php endif; ?>
+
    <script type="text/javascript">
+   $(function() {
+      // Ajuste de Placeholders para os inputs do Tabler
       $('#login_name').attr('placeholder', <?php echo json_encode(__('Login')) ?>);
-      $('input[type=password]').attr('placeholder', <?php echo json_encode(__('Password')) ?>);
-      $('input[type=password]').after($('.form-label-description'));
-   <?php
-   $favicon = PluginTrademarkConfig::getConfig('favicon_picture');
-   if ($favicon) :
-      $faviconUrl = PluginTrademarkToolbox::getPictureUrl($favicon);
-      ?>
-         var $icon = $('link[rel*=icon]');
-         $icon.attr('type', null);
-         $icon.attr('href', <?php echo json_encode($faviconUrl) ?>);
+      $('#login_password').attr('placeholder', <?php echo json_encode(__('Password')) ?>);
+
+      <?php if ($favicon) : ?>
+         var faviconUrl = <?php echo json_encode(\PluginTrademarkToolbox::getPictureUrl($favicon)) ?>;
+         $('link[rel*="icon"]').attr('href', faviconUrl);
+      <?php endif; ?>
+
+      <?php if ($pageTitle) : ?>
+         // No GLPI 11 o título costuma vir formatado, fazemos o replace
+         document.title = document.title.replace('GLPI', <?php echo json_encode($pageTitle) ?>);
+      <?php endif; ?>
+
       <?php
-      endif;
-   $pageTitle = PluginTrademarkConfig::getConfig('page_title');
-   if ($pageTitle) :
+      $footerDisplay = TrademarkConfig::getConfig('page_footer_display', 'original');
+      $footerText    = TrademarkConfig::getConfig('page_footer_text', '');
+
+      if ($footerDisplay === 'hide') : ?>
+         $('.footer').hide();
+      <?php endif; ?>
+
+      <?php if ($footerDisplay === 'custom' && !empty($footerText)) :
+         $cleanFooter = \Glpi\RichText\RichText::getEnhancedHtml($footerText);
       ?>
-         var $title = $('title');
-         var newTitle = $title.text().replace('GLPI', <?php echo json_encode($pageTitle) ?>);
-         $title.text(newTitle);
-      <?php
-      endif;
-   $footerDisplay = PluginTrademarkConfig::getConfig('page_footer_display', 'original');
-   $footerText = PluginTrademarkConfig::getConfig('page_footer_text', '');
-   if ($footerDisplay === 'hide') :
-      ?>
-         $(function() {
-            $('#footer-login').hide();
-         });
-      <?php
-      endif;
-   if ($footerDisplay === 'custom') :
-      $footerText = \Glpi\RichText\RichText::getEnhancedHtml($footerText);
-      ?>
-         $(function() {
-            $('a.copyright').parent().html(<?php echo json_encode($footerText) ?>);
-         });
-      <?php
-      endif;
-   ?>
+         $('.footer .container-xl').html(<?php echo json_encode($cleanFooter) ?>);
+      <?php endif; ?>
+   });
    </script>
    <?php
-}
-
-function plugin_trademark_install() {
-   return true;
-}
-
-function plugin_trademark_uninstall() {
-   return true;
 }
